@@ -11,7 +11,7 @@
      #na chwilę obecną głównie po to, aby można było uruchomić skrypt z parametrem -verbose
     )
  
-$liczba_pingow = 10 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
+$liczba_pingow = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
 
 
 #pobieram strefy typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
@@ -45,23 +45,25 @@ $strefy | ForEach-Object {
         $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $rezultat. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
         $ping_ok = 0        # zmienna przechowująca wyniki pingów typu PASS
         $ping_nie_ok = 0    # zmienna przechowująca wyniki pingów typu FAIL
+        $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
-        Write-Progress -Activity “Testing servers for zone $($strefa | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $liczba_serwerow ($_)” -percentComplete ($iterator_serwerow / $liczba_serwerow*100)
+        Write-Progress -Id 1 -Activity “Testing servers for zone $($strefa | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $liczba_serwerow ($_)” -percentComplete ($iterator_serwerow / $liczba_serwerow*100)
 
         Write-Verbose "$iterator_serwerow. $_"
         
         ############################################################## TESTY PING ##############################################################
-        Write-Verbose " DNS Test..."
         # test DNS
+        Write-Verbose " DNS Test..."
+        Write-Progress -Id 2 -Activity "DNS Test..."
         $wynik_testdns = Test-DnsServer $_
         Write-Verbose " - $($wynik_testdns.Result)"
 
         ############################################################## TESTY PING ##############################################################
         # test PING
         DO{
-            Write-Verbose " PING Test nr $iterator_pingow of $liczba_pingow.."
-
+            Write-Verbose " PING Test nr $iterator_pingow of $liczba_pingow..."
+            Write-Progress -Id 2 -Activity "PING Test $iterator_pingow of $liczba_pingow..."
             # Pinguję sewer
             #$ping = get-wmiobject -Query "select * from win32_pingstatus where Address='$_'"
             $ping = Get-CimInstance -Query "select * from win32_pingstatus where Address='$_'"
