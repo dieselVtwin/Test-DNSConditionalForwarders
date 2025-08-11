@@ -102,7 +102,7 @@ $pZones | ForEach-Object {
         
         # I create an object with DNS and Ping test results
         $pResult += New-Object psobject -Property @{
-            Lp = 1
+            Count = 1
             IPAddress = $wynik_testdns.IPAddress
             Result = $wynik_testdns.Result
             RoundTripTime = $wynik_testdns.RoundTripTime
@@ -138,7 +138,7 @@ $pZones | ForEach-Object {
     Write-Output "RESULTS FOR ZONE $($pZone | Select-Object -ExpandProperty Name)"
 
     # displaying results
-    Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="pMean_pPings"} | Out-String)
+    Write-Output ($pResult | Format-Table -property "Count", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="pMean_pPings"} | Out-String)
 
     Clear-Variable -Name "pResult" -Scope Script 
     Clear-Variable -Name "iterator_pCount" -Scope Script
