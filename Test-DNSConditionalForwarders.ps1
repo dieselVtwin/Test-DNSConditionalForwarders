@@ -31,9 +31,9 @@ $pZones | ForEach-Object {
 
     # I assign servers belonging to zones to a variable
     $pServers = $_."MasterServers"
-    # I'm counting the server list - needed for the progress bar and lp.
+    # I'm counting the server list - needed for the progress bar and count.
     $pNumber_pServerList =  $pServers.count
-    # A variable that is an iterator for the loop examining servers. Needed for the progress bar and lp.
+    # A variable that is an iterator for the loop examining servers. Needed for the progress bar and count.
     $iterator_pServerList = 1 
 
 
@@ -42,7 +42,7 @@ $pZones | ForEach-Object {
     $pServers | ForEach-Object {
         
         $iterator_pPings = 1# iterator of the loop in which pings are performed
-        $iterator_pCount = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
+        $iterator_pCount = 1    # a variable that is an iterator for the loop that numbers the count column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
         $ping_ok = 0        # a variable storing the results of pings that PASS
         $ping_not_ok = 0    # a variable storing the results of pings that FAIL
         $time_start = [system.diagnostics.stopwatch]::StartNew()
