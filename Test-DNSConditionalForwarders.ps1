@@ -71,7 +71,7 @@ $pZones | ForEach-Object {
             # If PING got a response
             if ($ping.statuscode -eq 0) {
                 Write-Verbose " - $($ping | Select-Object -ExpandProperty ResponseTime)ms"
-                $suma_pPings += $ping.ResponseTime
+                $pTotal_pPings += $ping.ResponseTime
                 $ping_ok++;
             }
             # If PING did not get a response
@@ -95,7 +95,7 @@ $pZones | ForEach-Object {
             $srednia_pPings = "n/d"
         }
         else {     
-            $srednia_pPings = $suma_pPings / ($iterator_pPings-1)
+            $srednia_pPings = $pTotal_pPings / ($iterator_pPings-1)
             $srednia_pPings = [math]::round($srednia_pPings,2)
         }
 
@@ -115,7 +115,7 @@ $pZones | ForEach-Object {
 
         ########################################################## CLEARING VARIABLE CONTENT ###################################################
         Clear-Variable -Name "srednia_pPings" -Scope Script
-        #Clear-Variable -Name "suma_pPings" -Scope Script
+        #Clear-Variable -Name "pTotal_pPings" -Scope Script
 
     }# end of the ForEach-Object loop processing servers from zones
 
