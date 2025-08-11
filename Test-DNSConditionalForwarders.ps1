@@ -2,49 +2,49 @@
 ##### THIS SCRIPT MUST BE RUN FROM  WINDOWS 2012 ENVOIREMENT OR ABOVE WITH DNS ROLE INSTALLED  ####
 ################################ AND WITH ADMINISTRATOR RIGHTS ####################################
 
-# Skrypt można uruchamiać z parametrem -verbose
+# The script can be run with the -verbose parameter
 
 
 [CmdletBinding()]
     param (
-    #tutaj można definiować parametry, które mają być przekazywane przy uruchamianiu skryptu
-    #na chwilę obecną głównie po to, aby można było uruchomić skrypt z parametrem -verbose
+    #here you can define parameters to be passed when running the script
+    #for now, this is mainly to allow the script to be run with the -verbose parameter
     )
 
-$pNumber_pPings = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
+$pNumber_pPings = 3 # How many times should ping check server availability? This variable can be set as needed.
 
 
-#pobieram zones typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
+#I'm downloading Conditional Forwarder zones from DNS. Therefore, this script must be run on the machine hosting the DNS server.
 #$pZones = Get-WmiObject -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -Filter "ZoneType = 4" | Select-Object Name, MasterServers
 $pZones = Get-CimInstance -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -property "Name", "MasterServers" -filter "zonetype = 4"
 
-# Rozpoczynam testowanie stref
+# I'm starting to test the zones
 $pZones | ForEach-Object {
 
-    # Tablica przechowująca wyniki testów. Za każdą iteracją pętli ForEach-Object tworzona od nowa, aby zawierała dane tylko aktualnej zones
+    # An array storing test results. It is recreated with each iteration of the ForEach-Object loop to contain only the data for the current zone.
     $pResult = @() 
 
-    # Nazwę zones przypisuję do zmiennej
+    # I assign the name zones to the variable
     $pZone =  $_ | Select-Object "Name"
 
     Write-Verbose "Zone $($pZone | Select-Object -ExpandProperty Name)"
 
-    # servers należące do zones przypisuję do zmiennej
+    # I assign servers belonging to zones to a variable
     $pServers = $_."MasterServers"
-    # Zliczam listę serwerów - potrzebne dla progress bara i lp.
+    # I'm counting the server list - needed for the progress bar and lp.
     $pNumber_pServerList =  $pServers.count
-    # Zmienna będąca iteratorem pętli badającej servers. Potrzebne dla progress bara i lp.
+    # A variable that is an iterator for the loop examining servers. Needed for the progress bar and lp.
     $iterator_pServerList = 1 
 
 
 
-    # Rozpoczynam testowanie serwerów w strefie
+    # I'm starting to test servers in the zone
     $pServers | ForEach-Object {
         
-        $iterator_pPings = 1# iterator pętli w której wykonywane są pingi
-        $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $pResult. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
-        $ping_ok = 0        # zmienna przechowująca wyniki pingów typu PASS
-        $ping_nie_ok = 0    # zmienna przechowująca wyniki pingów typu FAIL
+        $iterator_pPings = 1# iterator of the loop in which pings are performed
+        $iterator_lp = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
+        $ping_ok = 0        # a variable storing the results of pings that PASS
+        $ping_nie_ok = 0    # a variable storing the results of pings that FAIL
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
@@ -52,45 +52,45 @@ $pZones | ForEach-Object {
 
         Write-Verbose "$iterator_pServerList. $_"
         
-        ############################################################## TESTY PING ##############################################################
+        ############################################################## TESTS PING ##############################################################
         # test DNS
         Write-Verbose " DNS Test..."
         Write-Progress -Id 2 -Activity "DNS Test..."
         $wynik_testdns = Test-DnsServer $_
         Write-Verbose " - $($wynik_testdns.Result)"
 
-        ############################################################## TESTY PING ##############################################################
+        ############################################################## TESTS PING ##############################################################
         # test PING
         DO{
             Write-Verbose " PING Test nr $iterator_pPings of $pNumber_pPings..."
             Write-Progress -Id 2 -Activity "PING Test $iterator_pPings of $pNumber_pPings..."
-            # Pinguję sewer
+            # I'm pinging the server
             #$ping = get-wmiobject -Query "select * from win32_pingstatus where Address='$_'"
             $ping = Get-CimInstance -Query "select * from win32_pingstatus where Address='$_'"
 
-            # Jeżeli PING uzyskał odpowiedź
+            # If PING got a response
             if ($ping.statuscode -eq 0) {
                 Write-Verbose " - $($ping | Select-Object -ExpandProperty ResponseTime)ms"
                 $suma_pPings += $ping.ResponseTime
                 $ping_ok++;
             }
-            # Jeżeli PING nie uzyskał odpowiedzi
+            # If PING did not get a response
             else {
                 Write-Verbose " - Server did not respond to PING."
                 $ping_nie_ok++;
             }
 
-            # zmienna zliczająca ile pingów zostało wykonanych
+            # a variable counting how many pings have been performed
             $iterator_pPings++
 
         } While ($iterator_pPings -le $pNumber_pPings)
 
-        # testy DNS i PING zostały zakończone, więc zmienna iteracyjna serwerów zwiększana jest o 1. Wykorzystywana chyba tylko do progress bara 
+        # DNS and PING tests have been completed, so the server iteration variable is incremented by 1. Probably only used for the progress bar
         $iterator_pServerList++
 
 
-        ###################################### OBLICZANIE ŚREDNIEJ Z PINGÓW I TWORZENIE OBIEKTU PRZECHOWUJĄCEGO WYNIKI ###############################     
-        # obliczanie średniej z pingów
+        ###################################### AVERAGING THE PINGS AND CREATING AN OBJECT TO STORE THE RESULTS ###############################
+        # calculating the average of pings
         if (($ping_nie_ok+1) -eq $iterator_pPings){
             $srednia_pPings = "n/d"
         }
@@ -100,7 +100,7 @@ $pZones | ForEach-Object {
         }
 
         
-        #Tworzę obiekt z wynikami testów DNS i Ping
+        # I create an object with DNS and Ping test results
         $pResult += New-Object psobject -Property @{
             Lp = 1
             IPAddress = $wynik_testdns.IPAddress
@@ -113,34 +113,34 @@ $pZones | ForEach-Object {
         }
 
 
-        ########################################################## CZYSZCZENIE ZAWARTOŚCI ZMIENNYCH ###################################################
+        ########################################################## CLEARING VARIABLE CONTENT ###################################################
         Clear-Variable -Name "srednia_pPings" -Scope Script
         #Clear-Variable -Name "suma_pPings" -Scope Script
 
-    }# koniec pętli ForEach-Object przetwarzającej servers ze zones
+    }# end of the ForEach-Object loop processing servers from zones
 
-    # czyszczenie zmiennej zliczającej ilość testowanych serwerów. Ta zmienna potrzebna jest tylko do progress bara.
+    # Clearing the variable counting the number of servers being tested. This variable is only needed for the progress bar.
     Clear-Variable -Name "iterator_pServerList" -Scope Script 
 
 
-    ######################################################### SORTOWANIE REZULTATÓW I WYŚWIETLANIE WYNIKÓW ################################################
-    # sortowanie rezultatów w tablicy wg testu dns i pingów
+    ######################################################### SORTING AND DISPLAYING RESULTS ################################################
+    # sorting results in the table by DNS and ping test
     $pResult = $pResult | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pPings";Ascending=$true}
 
-    # dopiero po posortowaniu wyników numerowana jest kolumna lp w obiekcie z wynikami.
+    # only after the results are sorted, the number column in the results object is numbered.
     $pResult | ForEach-Object {
         $_.lp = $iterator_lp
         $iterator_lp ++
     }
 
 
-    # wyświetlana nazwa zones
+    # displayed name zones
     Write-Output "RESULTS FOR ZONE $($pZone | Select-Object -ExpandProperty Name)"
 
-    #wyświetlanie wyników
+    # displaying results
     Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
 
     Clear-Variable -Name "pResult" -Scope Script 
     Clear-Variable -Name "iterator_lp" -Scope Script
 
-}#koniec przetwarzania pętli ForEach-Object ze strefą Conditional Forwarder
+} # end of ForEach-Object loop processing with Conditional Forwarder zone
