@@ -14,22 +14,22 @@
 $pNumber_pPings = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
 
 
-#pobieram strefy typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
+#pobieram zones typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
 #$pZones = Get-WmiObject -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -Filter "ZoneType = 4" | Select-Object Name, MasterServers
 $pZones = Get-CimInstance -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -property "Name", "MasterServers" -filter "zonetype = 4"
 
 # Rozpoczynam testowanie stref
 $pZones | ForEach-Object {
 
-    # Tablica przechowująca wyniki testów. Za każdą iteracją pętli ForEach-Object tworzona od nowa, aby zawierała dane tylko aktualnej strefy
+    # Tablica przechowująca wyniki testów. Za każdą iteracją pętli ForEach-Object tworzona od nowa, aby zawierała dane tylko aktualnej zones
     $rezultat = @() 
 
-    # Nazwę strefy przypisuję do zmiennej
+    # Nazwę zones przypisuję do zmiennej
     $strefa =  $_ | Select-Object "Name"
 
     Write-Verbose "STREFA $($strefa | Select-Object -ExpandProperty Name)"
 
-    # Serwery należące do strefy przypisuję do zmiennej
+    # Serwery należące do zones przypisuję do zmiennej
     $serwery = $_."MasterServers"
     # Zliczam listę serwerów - potrzebne dla progress bara i lp.
     $pNumber_serwerow =  $serwery.count
@@ -117,7 +117,7 @@ $pZones | ForEach-Object {
         Clear-Variable -Name "srednia_pPings" -Scope Script
         #Clear-Variable -Name "suma_pPings" -Scope Script
 
-    }# koniec pętli ForEach-Object przetwarzającej serwery ze strefy
+    }# koniec pętli ForEach-Object przetwarzającej serwery ze zones
 
     # czyszczenie zmiennej zliczającej ilość testowanych serwerów. Ta zmienna potrzebna jest tylko do progress bara.
     Clear-Variable -Name "iterator_serwerow" -Scope Script 
@@ -134,7 +134,7 @@ $pZones | ForEach-Object {
     }
 
 
-    # wyświetlana nazwa strefy
+    # wyświetlana nazwa zones
     Write-Output "RESULTS FOR ZONE $($strefa | Select-Object -ExpandProperty Name)"
 
     #wyświetlanie wyników
