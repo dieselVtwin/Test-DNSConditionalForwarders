@@ -11,7 +11,7 @@
     #na chwilę obecną głównie po to, aby można było uruchomić skrypt z parametrem -verbose
     )
 
-$liczba_pingow = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
+$pNumber_pingow = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
 
 
 #pobieram strefy typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
@@ -32,7 +32,7 @@ $strefy | ForEach-Object {
     # Serwery należące do strefy przypisuję do zmiennej
     $serwery = $_."MasterServers"
     # Zliczam listę serwerów - potrzebne dla progress bara i lp.
-    $liczba_serwerow =  $serwery.count
+    $pNumber_serwerow =  $serwery.count
     # Zmienna będąca iteratorem pętli badającej serwery. Potrzebne dla progress bara i lp.
     $iterator_serwerow = 1 
 
@@ -48,7 +48,7 @@ $strefy | ForEach-Object {
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
-        Write-Progress -Id 1 -Activity “Testing servers for zone $($strefa | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $liczba_serwerow ($_)” -percentComplete ($iterator_serwerow / $liczba_serwerow*100)
+        Write-Progress -Id 1 -Activity “Testing servers for zone $($strefa | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $pNumber_serwerow ($_)” -percentComplete ($iterator_serwerow / $pNumber_serwerow*100)
 
         Write-Verbose "$iterator_serwerow. $_"
         
@@ -62,8 +62,8 @@ $strefy | ForEach-Object {
         ############################################################## TESTY PING ##############################################################
         # test PING
         DO{
-            Write-Verbose " PING Test nr $iterator_pingow of $liczba_pingow..."
-            Write-Progress -Id 2 -Activity "PING Test $iterator_pingow of $liczba_pingow..."
+            Write-Verbose " PING Test nr $iterator_pingow of $pNumber_pingow..."
+            Write-Progress -Id 2 -Activity "PING Test $iterator_pingow of $pNumber_pingow..."
             # Pinguję sewer
             #$ping = get-wmiobject -Query "select * from win32_pingstatus where Address='$_'"
             $ping = Get-CimInstance -Query "select * from win32_pingstatus where Address='$_'"
@@ -83,7 +83,7 @@ $strefy | ForEach-Object {
             # zmienna zliczająca ile pingów zostało wykonanych
             $iterator_pingow++
 
-        } While ($iterator_pingow -le $liczba_pingow)
+        } While ($iterator_pingow -le $pNumber_pingow)
 
         # testy DNS i PING zostały zakończone, więc zmienna iteracyjna serwerów zwiększana jest o 1. Wykorzystywana chyba tylko do progress bara 
         $iterator_serwerow++
