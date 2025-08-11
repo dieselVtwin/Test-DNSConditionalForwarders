@@ -45,7 +45,7 @@ $pZones | ForEach-Object {
         $iterator_lp = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
         $ping_ok = 0        # a variable storing the results of pings that PASS
         $ping_not_ok = 0    # a variable storing the results of pings that FAIL
-        $czas_start = [system.diagnostics.stopwatch]::StartNew()
+        $time_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
         Write-Progress -Id 1 -Activity “Testing servers for zone $($pZone | Select-Object -ExpandProperty Name)” -status “Server $iterator_pServerList z $pNumber_pServerList ($_)” -percentComplete ($iterator_pServerList / $pNumber_pServerList*100)
