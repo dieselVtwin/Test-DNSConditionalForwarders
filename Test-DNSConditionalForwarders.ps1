@@ -30,16 +30,16 @@ $pZones | ForEach-Object {
     Write-Verbose "Zone $($pZone | Select-Object -ExpandProperty Name)"
 
     # Serwery należące do zones przypisuję do zmiennej
-    $serwery = $_."MasterServers"
+    $pServers = $_."MasterServers"
     # Zliczam listę serwerów - potrzebne dla progress bara i lp.
-    $pNumber_serwerow =  $serwery.count
+    $pNumber_serwerow =  $pServers.count
     # Zmienna będąca iteratorem pętli badającej serwery. Potrzebne dla progress bara i lp.
     $iterator_serwerow = 1 
 
 
 
     # Rozpoczynam testowanie serwerów w strefie
-    $serwery | ForEach-Object {
+    $pServers | ForEach-Object {
         
         $iterator_pPings = 1# iterator pętli w której wykonywane są pingi
         $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $pResult. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
