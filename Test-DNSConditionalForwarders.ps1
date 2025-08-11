@@ -32,9 +32,9 @@ $pZones | ForEach-Object {
     # servers należące do zones przypisuję do zmiennej
     $pServers = $_."MasterServers"
     # Zliczam listę serwerów - potrzebne dla progress bara i lp.
-    $pNumber_serwerow =  $pServers.count
+    $pNumber_pServerList =  $pServers.count
     # Zmienna będąca iteratorem pętli badającej servers. Potrzebne dla progress bara i lp.
-    $iterator_serwerow = 1 
+    $iterator_pServerList = 1 
 
 
 
@@ -48,9 +48,9 @@ $pZones | ForEach-Object {
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
-        Write-Progress -Id 1 -Activity “Testing servers for zone $($pZone | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $pNumber_serwerow ($_)” -percentComplete ($iterator_serwerow / $pNumber_serwerow*100)
+        Write-Progress -Id 1 -Activity “Testing servers for zone $($pZone | Select-Object -ExpandProperty Name)” -status “Server $iterator_pServerList z $pNumber_pServerList ($_)” -percentComplete ($iterator_pServerList / $pNumber_pServerList*100)
 
-        Write-Verbose "$iterator_serwerow. $_"
+        Write-Verbose "$iterator_pServerList. $_"
         
         ############################################################## TESTY PING ##############################################################
         # test DNS
@@ -86,7 +86,7 @@ $pZones | ForEach-Object {
         } While ($iterator_pPings -le $pNumber_pPings)
 
         # testy DNS i PING zostały zakończone, więc zmienna iteracyjna serwerów zwiększana jest o 1. Wykorzystywana chyba tylko do progress bara 
-        $iterator_serwerow++
+        $iterator_pServerList++
 
 
         ###################################### OBLICZANIE ŚREDNIEJ Z PINGÓW I TWORZENIE OBIEKTU PRZECHOWUJĄCEGO WYNIKI ###############################     
@@ -120,7 +120,7 @@ $pZones | ForEach-Object {
     }# koniec pętli ForEach-Object przetwarzającej servers ze zones
 
     # czyszczenie zmiennej zliczającej ilość testowanych serwerów. Ta zmienna potrzebna jest tylko do progress bara.
-    Clear-Variable -Name "iterator_serwerow" -Scope Script 
+    Clear-Variable -Name "iterator_pServerList" -Scope Script 
 
 
     ######################################################### SORTOWANIE REZULTATÓW I WYŚWIETLANIE WYNIKÓW ################################################
