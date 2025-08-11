@@ -29,11 +29,11 @@ $pZones | ForEach-Object {
 
     Write-Verbose "Zone $($pZone | Select-Object -ExpandProperty Name)"
 
-    # Serwery należące do zones przypisuję do zmiennej
+    # servers należące do zones przypisuję do zmiennej
     $pServers = $_."MasterServers"
     # Zliczam listę serwerów - potrzebne dla progress bara i lp.
     $pNumber_serwerow =  $pServers.count
-    # Zmienna będąca iteratorem pętli badającej serwery. Potrzebne dla progress bara i lp.
+    # Zmienna będąca iteratorem pętli badającej servers. Potrzebne dla progress bara i lp.
     $iterator_serwerow = 1 
 
 
@@ -117,7 +117,7 @@ $pZones | ForEach-Object {
         Clear-Variable -Name "srednia_pPings" -Scope Script
         #Clear-Variable -Name "suma_pPings" -Scope Script
 
-    }# koniec pętli ForEach-Object przetwarzającej serwery ze zones
+    }# koniec pętli ForEach-Object przetwarzającej servers ze zones
 
     # czyszczenie zmiennej zliczającej ilość testowanych serwerów. Ta zmienna potrzebna jest tylko do progress bara.
     Clear-Variable -Name "iterator_serwerow" -Scope Script 
