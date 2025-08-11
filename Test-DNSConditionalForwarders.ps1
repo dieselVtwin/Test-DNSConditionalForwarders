@@ -42,7 +42,7 @@ $pZones | ForEach-Object {
     $pServers | ForEach-Object {
         
         $iterator_pPings = 1# iterator of the loop in which pings are performed
-        $iterator_lp = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
+        $iterator_pCount = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
         $ping_ok = 0        # a variable storing the results of pings that PASS
         $ping_not_ok = 0    # a variable storing the results of pings that FAIL
         $time_start = [system.diagnostics.stopwatch]::StartNew()
@@ -129,8 +129,8 @@ $pZones | ForEach-Object {
 
     # only after the results are sorted, the number column in the results object is numbered.
     $pResult | ForEach-Object {
-        $_.lp = $iterator_lp
-        $iterator_lp ++
+        $_.pCount = $iterator_pCount
+        $iterator_pCount ++
     }
 
 
@@ -141,6 +141,6 @@ $pZones | ForEach-Object {
     Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="pMean_pPings"} | Out-String)
 
     Clear-Variable -Name "pResult" -Scope Script 
-    Clear-Variable -Name "iterator_lp" -Scope Script
+    Clear-Variable -Name "iterator_pCount" -Scope Script
 
 } # end of ForEach-Object loop processing with Conditional Forwarder zone
