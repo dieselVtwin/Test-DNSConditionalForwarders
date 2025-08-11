@@ -27,7 +27,7 @@ $pZones | ForEach-Object {
     # Nazwę zones przypisuję do zmiennej
     $pZone =  $_ | Select-Object "Name"
 
-    Write-Verbose "STREFA $($pZone | Select-Object -ExpandProperty Name)"
+    Write-Verbose "Zone $($pZone | Select-Object -ExpandProperty Name)"
 
     # Serwery należące do zones przypisuję do zmiennej
     $serwery = $_."MasterServers"
