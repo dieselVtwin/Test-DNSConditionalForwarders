@@ -11,7 +11,7 @@
     #na chwilę obecną głównie po to, aby można było uruchomić skrypt z parametrem -verbose
     )
 
-$pNumber_pingow = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
+$pNumber_pPings = 3 # ile razy ping ma badać dostępność serwera? Tę zmienną można ustawiać wg potrzeb. 
 
 
 #pobieram strefy typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
@@ -41,7 +41,7 @@ $strefy | ForEach-Object {
     # Rozpoczynam testowanie serwerów w strefie
     $serwery | ForEach-Object {
         
-        $iterator_pingow = 1# iterator pętli w której wykonywane są pingi
+        $iterator_pPings = 1# iterator pętli w której wykonywane są pingi
         $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $rezultat. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
         $ping_ok = 0        # zmienna przechowująca wyniki pingów typu PASS
         $ping_nie_ok = 0    # zmienna przechowująca wyniki pingów typu FAIL
@@ -62,8 +62,8 @@ $strefy | ForEach-Object {
         ############################################################## TESTY PING ##############################################################
         # test PING
         DO{
-            Write-Verbose " PING Test nr $iterator_pingow of $pNumber_pingow..."
-            Write-Progress -Id 2 -Activity "PING Test $iterator_pingow of $pNumber_pingow..."
+            Write-Verbose " PING Test nr $iterator_pPings of $pNumber_pPings..."
+            Write-Progress -Id 2 -Activity "PING Test $iterator_pPings of $pNumber_pPings..."
             # Pinguję sewer
             #$ping = get-wmiobject -Query "select * from win32_pingstatus where Address='$_'"
             $ping = Get-CimInstance -Query "select * from win32_pingstatus where Address='$_'"
@@ -71,7 +71,7 @@ $strefy | ForEach-Object {
             # Jeżeli PING uzyskał odpowiedź
             if ($ping.statuscode -eq 0) {
                 Write-Verbose " - $($ping | Select-Object -ExpandProperty ResponseTime)ms"
-                $suma_pingow += $ping.ResponseTime
+                $suma_pPings += $ping.ResponseTime
                 $ping_ok++;
             }
             # Jeżeli PING nie uzyskał odpowiedzi
@@ -81,9 +81,9 @@ $strefy | ForEach-Object {
             }
 
             # zmienna zliczająca ile pingów zostało wykonanych
-            $iterator_pingow++
+            $iterator_pPings++
 
-        } While ($iterator_pingow -le $pNumber_pingow)
+        } While ($iterator_pPings -le $pNumber_pPings)
 
         # testy DNS i PING zostały zakończone, więc zmienna iteracyjna serwerów zwiększana jest o 1. Wykorzystywana chyba tylko do progress bara 
         $iterator_serwerow++
@@ -91,12 +91,12 @@ $strefy | ForEach-Object {
 
         ###################################### OBLICZANIE ŚREDNIEJ Z PINGÓW I TWORZENIE OBIEKTU PRZECHOWUJĄCEGO WYNIKI ###############################     
         # obliczanie średniej z pingów
-        if (($ping_nie_ok+1) -eq $iterator_pingow){
-            $srednia_pingow = "n/d"
+        if (($ping_nie_ok+1) -eq $iterator_pPings){
+            $srednia_pPings = "n/d"
         }
         else {     
-            $srednia_pingow = $suma_pingow / ($iterator_pingow-1)
-            $srednia_pingow = [math]::round($srednia_pingow,2)
+            $srednia_pPings = $suma_pPings / ($iterator_pPings-1)
+            $srednia_pPings = [math]::round($srednia_pPings,2)
         }
 
         
@@ -109,13 +109,13 @@ $strefy | ForEach-Object {
             TcpTried = $wynik_testdns.TcpTried
             UdpTried = $wynik_testdns.UdpTried
             Pingi = "$ping_ok/$ping_nie_ok"
-            Srednia_pingow = $srednia_pingow
+            Srednia_pPings = $srednia_pPings
         }
 
 
         ########################################################## CZYSZCZENIE ZAWARTOŚCI ZMIENNYCH ###################################################
-        Clear-Variable -Name "srednia_pingow" -Scope Script
-        #Clear-Variable -Name "suma_pingow" -Scope Script
+        Clear-Variable -Name "srednia_pPings" -Scope Script
+        #Clear-Variable -Name "suma_pPings" -Scope Script
 
     }# koniec pętli ForEach-Object przetwarzającej serwery ze strefy
 
@@ -125,7 +125,7 @@ $strefy | ForEach-Object {
 
     ######################################################### SORTOWANIE REZULTATÓW I WYŚWIETLANIE WYNIKÓW ################################################
     # sortowanie rezultatów w tablicy wg testu dns i pingów
-    $rezultat = $rezultat | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pingow";Ascending=$true}
+    $rezultat = $rezultat | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pPings";Ascending=$true}
 
     # dopiero po posortowaniu wyników numerowana jest kolumna lp w obiekcie z wynikami.
     $rezultat | ForEach-Object {
@@ -138,7 +138,7 @@ $strefy | ForEach-Object {
     Write-Output "RESULTS FOR ZONE $($strefa | Select-Object -ExpandProperty Name)"
 
     #wyświetlanie wyników
-    Write-Output ($rezultat | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pingow"} | Out-String)
+    Write-Output ($rezultat | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
 
     Clear-Variable -Name "rezultat" -Scope Script 
     Clear-Variable -Name "iterator_lp" -Scope Script
