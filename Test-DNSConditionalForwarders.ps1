@@ -92,11 +92,11 @@ $pZones | ForEach-Object {
         ###################################### AVERAGING THE PINGS AND CREATING AN OBJECT TO STORE THE RESULTS ###############################
         # calculating the average of pings
         if (($ping_not_ok+1) -eq $iterator_pPings){
-            $srednia_pPings = "n/d"
+            $pMean_pPings = "n/d"
         }
         else {     
-            $srednia_pPings = $pTotal_pPings / ($iterator_pPings-1)
-            $srednia_pPings = [math]::round($srednia_pPings,2)
+            $pMean_pPings = $pTotal_pPings / ($iterator_pPings-1)
+            $pMean_pPings = [math]::round($pMean_pPings,2)
         }
 
         
@@ -109,12 +109,12 @@ $pZones | ForEach-Object {
             TcpTried = $wynik_testdns.TcpTried
             UdpTried = $wynik_testdns.UdpTried
             Pingi = "$ping_ok/$ping_not_ok"
-            Srednia_pPings = $srednia_pPings
+            pMean_pPings = $pMean_pPings
         }
 
 
         ########################################################## CLEARING VARIABLE CONTENT ###################################################
-        Clear-Variable -Name "srednia_pPings" -Scope Script
+        Clear-Variable -Name "pMean_pPings" -Scope Script
         #Clear-Variable -Name "pTotal_pPings" -Scope Script
 
     }# end of the ForEach-Object loop processing servers from zones
@@ -125,7 +125,7 @@ $pZones | ForEach-Object {
 
     ######################################################### SORTING AND DISPLAYING RESULTS ################################################
     # sorting results in the table by DNS and ping test
-    $pResult = $pResult | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pPings";Ascending=$true}
+    $pResult = $pResult | Sort-Object @{expression="Result";Descending=$true}, @{expression="pMean_pPings";Ascending=$true}
 
     # only after the results are sorted, the number column in the results object is numbered.
     $pResult | ForEach-Object {
@@ -138,7 +138,7 @@ $pZones | ForEach-Object {
     Write-Output "RESULTS FOR ZONE $($pZone | Select-Object -ExpandProperty Name)"
 
     # displaying results
-    Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
+    Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="pMean_pPings"} | Out-String)
 
     Clear-Variable -Name "pResult" -Scope Script 
     Clear-Variable -Name "iterator_lp" -Scope Script
