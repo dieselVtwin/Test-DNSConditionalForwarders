@@ -44,7 +44,7 @@ $pZones | ForEach-Object {
         $iterator_pPings = 1# iterator of the loop in which pings are performed
         $iterator_lp = 1    # a variable that is an iterator for the loop that numbers the lp column in the $pResult object. The results are numbered only after they are sorted by the DNS and PING test results.
         $ping_ok = 0        # a variable storing the results of pings that PASS
-        $ping_nie_ok = 0    # a variable storing the results of pings that FAIL
+        $ping_not_ok = 0    # a variable storing the results of pings that FAIL
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
@@ -77,7 +77,7 @@ $pZones | ForEach-Object {
             # If PING did not get a response
             else {
                 Write-Verbose " - Server did not respond to PING."
-                $ping_nie_ok++;
+                $ping_not_ok++;
             }
 
             # a variable counting how many pings have been performed
@@ -91,7 +91,7 @@ $pZones | ForEach-Object {
 
         ###################################### AVERAGING THE PINGS AND CREATING AN OBJECT TO STORE THE RESULTS ###############################
         # calculating the average of pings
-        if (($ping_nie_ok+1) -eq $iterator_pPings){
+        if (($ping_not_ok+1) -eq $iterator_pPings){
             $srednia_pPings = "n/d"
         }
         else {     
@@ -108,7 +108,7 @@ $pZones | ForEach-Object {
             RoundTripTime = $wynik_testdns.RoundTripTime
             TcpTried = $wynik_testdns.TcpTried
             UdpTried = $wynik_testdns.UdpTried
-            Pingi = "$ping_ok/$ping_nie_ok"
+            Pingi = "$ping_ok/$ping_not_ok"
             Srednia_pPings = $srednia_pPings
         }
 
