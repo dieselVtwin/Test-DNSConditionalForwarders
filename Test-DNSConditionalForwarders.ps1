@@ -25,9 +25,9 @@ $pZones | ForEach-Object {
     $pResult = @() 
 
     # Nazwę zones przypisuję do zmiennej
-    $strefa =  $_ | Select-Object "Name"
+    $pZone =  $_ | Select-Object "Name"
 
-    Write-Verbose "STREFA $($strefa | Select-Object -ExpandProperty Name)"
+    Write-Verbose "STREFA $($pZone | Select-Object -ExpandProperty Name)"
 
     # Serwery należące do zones przypisuję do zmiennej
     $serwery = $_."MasterServers"
@@ -48,7 +48,7 @@ $pZones | ForEach-Object {
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
 
         # progress bar
-        Write-Progress -Id 1 -Activity “Testing servers for zone $($strefa | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $pNumber_serwerow ($_)” -percentComplete ($iterator_serwerow / $pNumber_serwerow*100)
+        Write-Progress -Id 1 -Activity “Testing servers for zone $($pZone | Select-Object -ExpandProperty Name)” -status “Server $iterator_serwerow z $pNumber_serwerow ($_)” -percentComplete ($iterator_serwerow / $pNumber_serwerow*100)
 
         Write-Verbose "$iterator_serwerow. $_"
         
@@ -135,7 +135,7 @@ $pZones | ForEach-Object {
 
 
     # wyświetlana nazwa zones
-    Write-Output "RESULTS FOR ZONE $($strefa | Select-Object -ExpandProperty Name)"
+    Write-Output "RESULTS FOR ZONE $($pZone | Select-Object -ExpandProperty Name)"
 
     #wyświetlanie wyników
     Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
