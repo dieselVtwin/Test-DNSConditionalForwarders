@@ -15,11 +15,11 @@ $pNumber_pPings = 3 # ile razy ping ma badać dostępność serwera? Tę zmienn�
 
 
 #pobieram strefy typu Conditional Forwarder z DNSa. Dlatego skrypt ten musi być uruchamiany na maszynie na której znajduje się serwer DNS.
-#$strefy = Get-WmiObject -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -Filter "ZoneType = 4" | Select-Object Name, MasterServers
-$strefy = Get-CimInstance -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -property "Name", "MasterServers" -filter "zonetype = 4"
+#$pZones = Get-WmiObject -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -Filter "ZoneType = 4" | Select-Object Name, MasterServers
+$pZones = Get-CimInstance -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone -property "Name", "MasterServers" -filter "zonetype = 4"
 
 # Rozpoczynam testowanie stref
-$strefy | ForEach-Object {
+$pZones | ForEach-Object {
 
     # Tablica przechowująca wyniki testów. Za każdą iteracją pętli ForEach-Object tworzona od nowa, aby zawierała dane tylko aktualnej strefy
     $rezultat = @() 
