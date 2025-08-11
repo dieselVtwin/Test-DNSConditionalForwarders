@@ -22,7 +22,7 @@ $pZones = Get-CimInstance -Namespace root\MicrosoftDNS -Class MicrosoftDNS_Zone 
 $pZones | ForEach-Object {
 
     # Tablica przechowująca wyniki testów. Za każdą iteracją pętli ForEach-Object tworzona od nowa, aby zawierała dane tylko aktualnej zones
-    $rezultat = @() 
+    $pResult = @() 
 
     # Nazwę zones przypisuję do zmiennej
     $strefa =  $_ | Select-Object "Name"
@@ -42,7 +42,7 @@ $pZones | ForEach-Object {
     $serwery | ForEach-Object {
         
         $iterator_pPings = 1# iterator pętli w której wykonywane są pingi
-        $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $rezultat. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
+        $iterator_lp = 1    # zmienna będąca iteratorem pętli, numerującej kolumnę lp w obiekcie $pResult. Numerowanie wyników wykonywane jest dopiero po ich posortowaniu wg wyników testu DNS i PING.
         $ping_ok = 0        # zmienna przechowująca wyniki pingów typu PASS
         $ping_nie_ok = 0    # zmienna przechowująca wyniki pingów typu FAIL
         $czas_start = [system.diagnostics.stopwatch]::StartNew()
@@ -101,7 +101,7 @@ $pZones | ForEach-Object {
 
         
         #Tworzę obiekt z wynikami testów DNS i Ping
-        $rezultat += New-Object psobject -Property @{
+        $pResult += New-Object psobject -Property @{
             Lp = 1
             IPAddress = $wynik_testdns.IPAddress
             Result = $wynik_testdns.Result
@@ -125,10 +125,10 @@ $pZones | ForEach-Object {
 
     ######################################################### SORTOWANIE REZULTATÓW I WYŚWIETLANIE WYNIKÓW ################################################
     # sortowanie rezultatów w tablicy wg testu dns i pingów
-    $rezultat = $rezultat | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pPings";Ascending=$true}
+    $pResult = $pResult | Sort-Object @{expression="Result";Descending=$true}, @{expression="Srednia_pPings";Ascending=$true}
 
     # dopiero po posortowaniu wyników numerowana jest kolumna lp w obiekcie z wynikami.
-    $rezultat | ForEach-Object {
+    $pResult | ForEach-Object {
         $_.lp = $iterator_lp
         $iterator_lp ++
     }
@@ -138,9 +138,9 @@ $pZones | ForEach-Object {
     Write-Output "RESULTS FOR ZONE $($strefa | Select-Object -ExpandProperty Name)"
 
     #wyświetlanie wyników
-    Write-Output ($rezultat | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
+    Write-Output ($pResult | Format-Table -property "Lp", "IPaddress", @{LABEL="Test DNS";Expression="Result"}, @{LABEL="Round Trip Time";Expression="RoundTripTime"}, @{LABEL="Ping Pass/Fail";Expression="Pingi"}, @{LABEL="Ping avg. time (ms)";Expression="Srednia_pPings"} | Out-String)
 
-    Clear-Variable -Name "rezultat" -Scope Script 
+    Clear-Variable -Name "pResult" -Scope Script 
     Clear-Variable -Name "iterator_lp" -Scope Script
 
 }#koniec przetwarzania pętli ForEach-Object ze strefą Conditional Forwarder
