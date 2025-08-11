@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Test-DNSConditionalForwarders** is a PowerShell script which checking servers listed in DNS Conditional Forwarders for working as an DNS server and measuring how fast they reply to PING command.
+**Test-DNSConditionalForwarders** is a PowerShell script to check servers listed in DNS Conditional Forwarders for working as an DNS server and measuring how fast they reply to PING command.
 
 ## How to use it and what it requires?
 
@@ -10,34 +10,38 @@ Simply download script to your local DNS server and run it with command:
 
 ```powershell
 .\Test-DNSConditionalForwarders.ps1
-
 ```
 
-## Parameters
+### Parameters
 
-By default script shows progress bar and summary at the end of its work. But if you want to know what it actually doing you can run it with parameter *-verbose*, like below:
+By default the script shows progress bar and summary at the end of its work.
+
+If you want to know what it actually doing you can run it with parameter *-verbose*, like below:
 
 ```powershell
 .\Test-DNSConditionalForwarders.ps1 -verbose
-
 ```
 
-## Requirements
+### Requirements
 
-* As script getting information about Conditional Forwarder zones from local DNS server using CIMInstance, it must be run at Windows Server with DNS role installed.  
+* As script getting information about Conditional Forwarder zones from local DNS server using CIMInstance, it must be run at Windows Server with DNS role installed.
+
 * Because of above it also require to be run with administrators rights.
 
 ---
 
-## For what it can be used?
+## What it can be used for?
 
-It can be used for maintaing **Conditional Forwarders Zones** in DNS server which you administrating.
-For example, once in a month, by running it you will know:
+It can be used for maintaing **Conditional Forwarders Zones** in DNS servers which you administrate.
+For example, running it regularly you will know:
 
-* if servers listed in Conditional Forwarders are still accessible,
-* if they accessible, is they still working as a DNS servers?
-* by using PING you will know how fast is connection to them
-* it will sort servers by ping results - knowing that you could change order of servers in Conditional Forwarder zone.
+* if servers listed in Conditional Forwarders are still accessible
+
+* if they accessible, are they still working as DNS servers
+
+* by using PING you will know how fast is the connection to them
+
+* it will sort servers by ping results - may be helpful to know if you should change the order of the servers in Conditional Forwarder zone
 
 *Example of results:*
 
@@ -58,5 +62,6 @@ Lp IPAddress       Test DNS   Round Trip Time Ping Pass/Fail Ping avg. time (ms)
 
 ## How it works?
 
-1. By using cmdlet [Test-DnsServer](https://docs.microsoft.com/en-us/powershell/module/dnsserver/test-dnsserver?view=win10-ps) it checking if server working as a DNS (it will return "Success" or "NoResponse") and it shows Round Trip Time (RRT).
-2. By using PING command it checking if server respond to ICMP packets, and how fast it will do it. By default script run ping for 10 times, and then it calculate average score.
+1. By using the cmdlet [Test-DnsServer](https://docs.microsoft.com/en-us/powershell/module/dnsserver/test-dnsserver?view=win10-ps) it checks if the server is working as a DNS and returns either "Success" or "NoResponse" for each server and it shows the Round Trip Time (RRT).
+
+2. By using the PING command it checks each server if it responds to the ICMP packets, and how fast it will do it. By default the script sends PING for 10 times, and then it calculates the average score.
